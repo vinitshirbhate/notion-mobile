@@ -49,7 +49,6 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <ThemedText>Hello </ThemedText>
         {/* <Button title="Create User" onPress={createUser} /> */}
         {/* <Button title="Create notion" onPress={createNotion} /> */}
         <DraggableNotionList />
