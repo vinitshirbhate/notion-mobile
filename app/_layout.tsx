@@ -1,6 +1,7 @@
 import {
   DarkTheme,
   DefaultTheme,
+  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -11,6 +12,8 @@ import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { initializeDb } from "@/myDbModule";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -20,18 +23,18 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const setup = async () => {
       try {
         await initializeDb();
-      } catch (error) {
-        console.error(error);
+      } catch (e) {
+        console.log(e);
       }
-      setLoading(false);
+      setIsLoading(false);
     };
+
     setup();
   }, []);
 
@@ -41,16 +44,26 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  if (!loaded && !loading) {
+  if (!loaded && !isLoading) {
     return null;
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <ActionSheetProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="doc-actions-sheet"
+              options={{ presentation: "modal" }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </ActionSheetProvider>
   );
 }
